@@ -1,6 +1,6 @@
 ﻿#pragma once
-#ifndef _RESMAN_H_
-#define _RESMAN_H_
+#ifndef _WIZ_RESMAN_H_
+#define _WIZ_RESMAN_H_
 
 #include <assert.h>
 #include <iostream>
@@ -133,4 +133,4 @@ private:
 	Container _container;
 };
 
-#endif // _RESMAN_H_
+#endif // _WIZ_RESMAN_H_
