@@ -43,11 +43,12 @@ public:
 		Hash _hash;
 	};
 
-	using Str = std::shared_ptr<Resource>;
-	using Wtr = std::weak_ptr<Resource>;
+	using Rptr = Resource *;
+	using Sptr = std::shared_ptr<Resource>;
+	using Wptr = std::weak_ptr<Resource>;
 
-	using Key = Resource *; // ResData*;
-	using Type = Wtr;
+	using Key = Rptr; // Resource *; // ResData*;
+	using Type = Wptr;
 
 	struct Hasher
 	{
@@ -110,10 +111,11 @@ public:
 	}
 
 private:
-	static Mutex &getMutex()
+	Mutex mutex_;
+
+	Mutex &getMutex()
 	{
-		static Mutex mutex;
-		return mutex;
+		return mutex_;
 	}
 
 	void release(Resource *resource)
