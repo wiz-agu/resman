@@ -27,20 +27,20 @@ public:
 			if (_handle != INVALID_HANDLE)
 				_data.destroyHandle(_handle);
 		}
-		ResData *getData() { return &_data; }
-		Handle getHandle()
+		ResData *getData() const noexcept { return &_data; }
+		Handle getHandle() const 
 		{
 			return _handle != INVALID_HANDLE ? _handle : _handle = _data.createHandle();
 		}
-		Hash getHash()
+		Hash getHash() const noexcept
 		{
 			return _hash != INVALID_HASH ? _hash : _hash = _data.createHash();
 		}
 
 	private:
 		ResData _data;
-		Handle _handle;
-		Hash _hash;
+		mutable Handle _handle;
+		mutable Hash _hash;
 	};
 
 	using Rptr = Resource *;
@@ -52,7 +52,7 @@ public:
 
 	struct Hasher
 	{
-		using is_transparent = void;
+		using is_transparent = void; 
 		auto operator()(Resource *resource) const noexcept
 		{
 			return resource->getHash();
@@ -87,8 +87,8 @@ public:
 		static ResManager manager;
 		return manager;
 	}
-
-	Str assign(ResData &&data)
+public:
+	Sptr assign(ResData &&data)
 	{
 		std::lock_guard<Mutex> lock(getMutex());
 		std::cout << "assign  " << data << " - ";
