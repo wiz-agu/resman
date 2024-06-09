@@ -21,34 +21,34 @@ public:
 	class Resource
 	{
 	public:
-		Resource(ResData &&data) : _data(std::move(data)), _handle(INVALID_HANDLE), _hash(INVALID_HASH) {}
+		Resource(ResData &&data) : data_(std::move(data)), handle_(INVALID_HANDLE), hash_(INVALID_HASH) {}
 		~Resource()
 		{
-			if (_handle != INVALID_HANDLE)
-				_data.destroyHandle(_handle);
+			if (handle_ != INVALID_HANDLE)
+				data_.destroyHandle(handle_);
 		}
-		ResData *getData() const noexcept { return &_data; }
+		ResData *getData() const noexcept { return &data_; }
 		Handle getHandle() const 
 		{
-			return _handle != INVALID_HANDLE ? _handle : _handle = _data.createHandle();
+			return handle_ != INVALID_HANDLE ? handle_ : handle_ = data_.createHandle();
 		}
 		Hash getHash() const noexcept
 		{
-			return _hash != INVALID_HASH ? _hash : _hash = _data.createHash();
+			return hash_ != INVALID_HASH ? hash_ : hash_ = data_.createHash();
 		}
 
 	private:
-		ResData _data;
-		mutable Handle _handle;
-		mutable Hash _hash;
+		ResData data_;
+		mutable Handle handle_;
+		mutable Hash hash_;
 	};
 
-	using Rptr = Resource *;
-	using Sptr = std::shared_ptr<Resource>;
-	using Wptr = std::weak_ptr<Resource>;
+	using RPtr = Resource *;
+	using SPtr = std::shared_ptr<Resource>;
+	using WPtr = std::weak_ptr<Resource>;
 
-	using Key = Rptr; // Resource *; // ResData*;
-	using Type = Wptr;
+	using Key = RPtr; // Resource *; // ResData*;
+	using Type = WPtr;
 
 	struct Hasher
 	{
@@ -84,16 +84,16 @@ public:
 
 	static ResManager &get()
 	{
-		static ResManager manager;
-		return manager;
+		static ResManager manager_;
+		return manager_;
 	}
 public:
-	Sptr assign(ResData &&data)
+	SPtr assign(ResData &&data)
 	{
 		std::lock_guard<Mutex> lock(getMutex());
 		std::cout << "assign  " << data << " - ";
-		auto it = _container.find(&data);
-		if (it != _container.end())
+		auto it = container_.find(&data);
+		if (it != container_.end())
 		{
 			std::cout << "found, return it\n";
 			return it->second.lock();
@@ -106,13 +106,11 @@ public:
 			{
 				ResManager::get().release(resource);
 			});
-		_container.insert({res.get(), res});
+		container_.insert({res.get(), res});
 		return res;
 	}
 
 private:
-	Mutex mutex_;
-
 	Mutex &getMutex()
 	{
 		return mutex_;
@@ -122,17 +120,19 @@ private:
 	{
 		std::lock_guard<Mutex> lock(getMutex());
 		std::cout << "release " << *resource->getData() << " - ";
-		auto it = _container.find(resource);
-		assert(it != _container.end());
+		auto it = container_.find(resource);
+		assert(it != container_.end());
 		std::cout << "thread id = " << std::this_thread::get_id() << ", ";
 		std::cout << "found, erase it\n";
-		_container.erase(it);
+		container_.erase(it);
 		delete resource;
 	}
 
 	ResManager() = default;
 	~ResManager() = default;
-	Container _container;
+ 
+	Mutex mutex_;
+	Container container_;
 };
 
 #endif // _WIZ_RESMAN_H_
