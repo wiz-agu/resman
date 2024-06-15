@@ -22,16 +22,20 @@ public:
 	{
 	public:
 		Resource(ResData &&data) : data_(std::move(data)), handle_(INVALID_HANDLE), hash_(INVALID_HASH) {}
+
 		~Resource()
 		{
 			if (handle_ != INVALID_HANDLE)
 				data_.destroyHandle(handle_);
 		}
+
 		ResData *getData() const noexcept { return &data_; }
-		Handle getHandle() const 
+
+		Handle getHandle() const
 		{
 			return handle_ != INVALID_HANDLE ? handle_ : handle_ = data_.createHandle();
 		}
+
 		Hash getHash() const noexcept
 		{
 			return hash_ != INVALID_HASH ? hash_ : hash_ = data_.createHash();
@@ -52,11 +56,12 @@ public:
 
 	struct Hasher
 	{
-		using is_transparent = void; 
+		using is_transparent = void;
 		auto operator()(Resource *resource) const noexcept
 		{
 			return resource->getHash();
 		}
+
 		auto operator()(ResData *data) const noexcept
 		{
 			return data->createHash();
@@ -70,6 +75,7 @@ public:
 		{
 			return left->getData()->operator==(*right->getData());
 		}
+
 		// bool operator()(Resource* resource, ResData* data) const noexcept {
 		//	return data->operator==(*resource->getData());
 		// }
@@ -87,6 +93,7 @@ public:
 		static ResManager manager_;
 		return manager_;
 	}
+
 public:
 	SPtr assign(ResData &&data)
 	{
@@ -129,8 +136,9 @@ private:
 	}
 
 	ResManager() = default;
+	
 	~ResManager() = default;
- 
+
 	Mutex mutex_;
 	Container container_;
 };
