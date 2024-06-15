@@ -11,7 +11,7 @@
 #include <mutex>
 #include <thread>
 
-template <typename ResData, typename Handle = unsigned int, Handle INVALID_HANDLE = 0>
+template <typename ResData, typename Handle = unsigned int, Handle INVALID_HANDLE = Handle(0)>
 class ResManager
 {
 public:
