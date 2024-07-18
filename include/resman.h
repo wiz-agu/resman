@@ -11,10 +11,12 @@
 #include <mutex>
 #include <thread>
 
-template <typename ResData, typename Handle = unsigned int, Handle INVALID_HANDLE = Handle(0)>
+template <typename ResData>
 class ResManager
 {
 public:
+	using Handle = ResData::Handle;
+	inline static constexpr Handle INVALID_HANDLE = ResData::INVALID_HANDLE;
 	using Hash = std::size_t;
 	inline static constexpr Hash INVALID_HASH = 0;
 
@@ -29,9 +31,9 @@ public:
 				data_.destroyHandle(handle_);
 		}
 
-		ResData *getData() const noexcept { return &data_; }
+		const ResData& getData() const noexcept { return data_; }
 
-		Handle getHandle() const
+		Handle getHandle() const noexcept
 		{
 			return handle_ != INVALID_HANDLE ? handle_ : handle_ = data_.createHandle();
 		}
