@@ -31,7 +31,10 @@ public:
 				data_.destroyHandle(handle_);
 		}
 
-		const ResData& getData() const noexcept { return data_; }
+		const ResData &getData() const noexcept
+		{
+			return data_;
+		}
 
 		Handle getHandle() const noexcept
 		{
@@ -59,6 +62,7 @@ public:
 	struct Hasher
 	{
 		using is_transparent = void;
+
 		auto operator()(Resource *resource) const noexcept
 		{
 			return resource->getHash();
@@ -73,6 +77,7 @@ public:
 	struct KeyEqual
 	{
 		using is_transparent = void;
+		
 		bool operator()(Resource *left, Resource *right) const noexcept
 		{
 			return left->getData()->operator==(*right->getData());
@@ -139,7 +144,7 @@ private:
 	}
 
 	ResManager() = default;
-	
+
 	~ResManager() = default;
 
 	Mutex mutex_;
